@@ -1,0 +1,197 @@
+@import "tailwindcss";
+
+/*
+  ClearDocs design tokens
+  - ink:   deep navy, the colour of official documents and passports
+  - stamp: violet, the ink colour of Indian government rubber stamps
+  - paper: cool off-white page background
+*/
+@theme {
+  --color-ink: #16233f;
+  --color-ink-soft: #2b3a5c;
+  --color-muted: #586178;
+  --color-line: #dce0e8;
+  --color-paper: #f5f6f9;
+  --color-surface: #ffffff;
+  --color-stamp: #5b3fa0;
+  --color-stamp-soft: #ece8f6;
+  --color-ok: #1e7a4e;
+  --color-danger: #b42318;
+
+  --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--color-stamp);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Reusable buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.75rem 1.4rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background-color 150ms, color 150ms, border-color 150ms;
+}
+.btn-primary {
+  background: var(--color-ink);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--color-stamp);
+}
+.btn-secondary {
+  border: 1.5px solid var(--color-ink);
+  color: var(--color-ink);
+}
+.btn-secondary:hover {
+  background: var(--color-ink);
+  color: #fff;
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Form fields */
+.field {
+  width: 100%;
+  border: 1.5px solid var(--color-line);
+  background: var(--color-surface);
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+  font-size: 1rem;
+  color: var(--color-ink);
+}
+.field:focus {
+  border-color: var(--color-stamp);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-stamp-soft);
+}
+
+/* The rubber-stamp animation in the hero. Each stamp "lands" one after another. */
+@keyframes stamp-land {
+  0% {
+    opacity: 0;
+    transform: scale(1.6) rotate(var(--tilt));
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.94) rotate(var(--tilt));
+  }
+  100% {
+    opacity: 0.92;
+    transform: scale(1) rotate(var(--tilt));
+  }
+}
+.stamp {
+  opacity: 0;
+  transform: rotate(var(--tilt));
+  animation: stamp-land 420ms cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+  animation-delay: var(--delay);
+}
+/* Small "pop" when the price estimate changes */
+@keyframes pop {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Success tick on the contact form */
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .stamp {
+    animation: none;
+    opacity: 0.92;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Blog post body: styles for the HTML that comes from WordPress */
+.prose-wp {
+  font-size: 1.075rem;
+  line-height: 1.75;
+  color: var(--color-ink-soft);
+}
+.prose-wp > * + * {
+  margin-top: 1.1em;
+}
+.prose-wp h2 {
+  margin-top: 2em;
+  font-size: 1.45rem;
+  line-height: 1.3;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+.prose-wp h3 {
+  margin-top: 1.6em;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+.prose-wp a {
+  color: var(--color-stamp);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prose-wp ul,
+.prose-wp ol {
+  padding-left: 1.4rem;
+}
+.prose-wp ul {
+  list-style: disc;
+}
+.prose-wp ol {
+  list-style: decimal;
+}
+.prose-wp li + li {
+  margin-top: 0.4em;
+}
+.prose-wp strong {
+  color: var(--color-ink);
+}
+.prose-wp img {
+  border-radius: 12px;
+  height: auto;
+}
+.prose-wp blockquote {
+  border-left: 3px solid var(--color-stamp);
+  padding-left: 1rem;
+  font-style: italic;
+}
