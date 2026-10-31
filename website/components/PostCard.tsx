@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { type Post, formatDate } from "@/lib/wordpress";
+import { type Post, formatDate, readingTime } from "@/lib/wordpress";
 
 export default function PostCard({ post }: { post: Post }) {
   return (
@@ -10,9 +10,11 @@ export default function PostCard({ post }: { post: Post }) {
           <Image src={post.image} alt="" fill className="object-cover" sizes="(min-width: 768px) 33vw, 100vw" />
         </div>
       )}
-      <time dateTime={post.date} className="text-sm text-muted">
-        {formatDate(post.date)}
-      </time>
+      <p className="text-sm text-muted">
+        <time dateTime={post.date}>{formatDate(post.date)}</time>
+        <span aria-hidden="true"> · </span>
+        {readingTime(post.content)}
+      </p>
       <h3 className="mt-2 text-lg font-bold leading-snug">
         {/* The ::after makes the whole card clickable while keeping one link for screen readers */}
         <Link href={`/blog/${post.slug}`} className="after:absolute after:inset-0 group-hover:text-stamp">

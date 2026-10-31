@@ -95,6 +95,14 @@ export async function getPost(slug: string): Promise<Post | undefined> {
   return samplePosts.find((p) => p.slug === slug);
 }
 
+// Estimated reading time, e.g. "3 min read".
+// Counts the words in the post body (without the HTML tags) and assumes 200 words a minute.
+export function readingTime(html: string) {
+  const words = stripTags(html).split(" ").filter(Boolean).length;
+  const minutes = Math.max(1, Math.round(words / 200));
+  return `${minutes} min read`;
+}
+
 export function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
 }
