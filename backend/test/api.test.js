@@ -1,9 +1,14 @@
-// End-to-end API tests. They start a throwaway in-memory MongoDB,
-// so they never touch your real database.   Run with:  npm test
+// End-to-end API tests.   Run with:  npm test
+//
+// Which database the tests use:
+//  - If TEST_MONGO_URI is set, they use that (e.g. the MongoDB already on your laptop).
+//    It must be a SEPARATE test database: it is wiped before and after the tests.
+//      PowerShell:  $env:TEST_MONGO_URI="mongodb://127.0.0.1:27017/cleardocs_test"; npm test
+//  - Otherwise they start a throwaway in-memory MongoDB (downloads it the first time).
+// Either way, your real "cleardocs" database is never touched.
 
 const { test, before, after } = require("node:test");
 const assert = require("node:assert/strict");
-const { MongoMemoryServer } = require("mongodb-memory-server");
 const mongoose = require("mongoose");
 
 process.env.JWT_SECRET = "test_secret";
@@ -37,8 +42,18 @@ function pdfForm(fields, fileName = "degree.pdf", type = "application/pdf") {
 }
 
 before(async () => {
-  mongo = await MongoMemoryServer.create();
-  await mongoose.connect(mongo.getUri());
+  let uri = process.env.TEST_MONGO_URI;
+  if (uri) {
+    if (/\/cleardocs(\?|$)/.test(uri)) {
+      throw new Error('TEST_MONGO_URI points at your real "cleardocs" database. Use a separate one, e.g. .../cleardocs_test');
+    }
+  } else {
+    const { MongoMemoryServer } = require("mongodb-memory-server");
+    mongo = await MongoMemoryServer.create();
+    uri = mongo.getUri();
+  }
+  await mongoose.connect(uri);
+  await mongoose.connection.dropDatabase(); // start from an empty test database
   await Service.insertMany(services);
   serviceId = (await Service.findOne({ slug: "apostille" }))._id.toString();
   await User.create({ name: "Admin", email: "admin@test.dev", password: "admin123", role: "admin" });
@@ -47,9 +62,12 @@ before(async () => {
 });
 
 after(async () => {
-  server.close();
-  await mongoose.disconnect();
-  await mongo.stop();
+  server?.close();
+  if (mongoose.connection.readyState === 1) {
+    await mongoose.connection.dropDatabase(); // leave nothing behind
+    await mongoose.disconnect();
+  }
+  await mongo?.stop();
 });
 
 test("health check", async () => {

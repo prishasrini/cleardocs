@@ -1,5 +1,5 @@
 import Constants from "expo-constants";
-import type { DocRequest, RequestStatus, Service, User } from "./types";
+import type { DocRequest, Enquiry, RequestStatus, Service, User } from "./types";
 
 // Where the Express backend is running.
 // 1. If EXPO_PUBLIC_API_URL is set in .env, use it (needed once the backend is deployed).
@@ -46,9 +46,15 @@ async function request<T>(path: string, { method = "GET", token, body, form }: O
       headers,
       body: form ?? (body ? JSON.stringify(body) : undefined),
     });
-  } catch {
+  } catch (err) {
+    // Only a real network failure means the server is unreachable.
+    // Anything else (for example a bad upload) is shown as it is, so it can be fixed.
+    const message = (err as Error)?.message ?? "";
+    const isNetwork = /network|fetch failed|connect|timed? ?out|offline/i.test(message);
     throw new ApiError(
-      `Can't reach the server at ${API_URL}. Check that the backend is running and your phone is on the same Wi-Fi.`,
+      isNetwork
+        ? `Can't reach the server at ${API_URL}. Check that the backend is running and your phone is on the same Wi-Fi.`
+        : `The request couldn't be sent: ${message || "unknown error"}`,
       0,
     );
   }
@@ -84,6 +90,9 @@ export const api = {
   // A 5-minute link that opens one uploaded file in the browser
   fileLink: (token: string, id: string, storedName: string) =>
     request<{ url: string }>(`/api/requests/${id}/files/${storedName}/link`, { token }),
+
+  // Contact form messages from the website (admin only)
+  enquiries: (token: string) => request<Enquiry[]>("/api/enquiries", { token }),
 
   updateStatus: (token: string, id: string, status: RequestStatus, note?: string) =>
     request<DocRequest>(`/api/requests/${id}/status`, { method: "PATCH", token, body: { status, note } }),

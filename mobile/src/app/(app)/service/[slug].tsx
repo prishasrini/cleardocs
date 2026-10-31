@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import * as DocumentPicker from "expo-document-picker";
+import { File } from "expo-file-system";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Animated, { FadeIn, FadeOut, LinearTransition } from "react-native-reanimated";
 import Button from "@/components/Button";
@@ -67,11 +68,13 @@ export default function NewRequestScreen() {
       if (Platform.OS === "web" && f.file) {
         form.append("files", f.file); // on the web the picker gives us a real File
       } else {
-        // On a phone, React Native uploads a file from its uri
+        // On a phone, Expo's fetch needs something it can read bytes from.
+        // We read the picked file with expo-file-system and keep its original name and type.
+        const picked = f;
         form.append("files", {
-          uri: f.uri,
-          name: f.name,
-          type: f.mimeType ?? "application/octet-stream",
+          name: picked.name,
+          type: picked.mimeType ?? "application/octet-stream",
+          bytes: () => new File(picked.uri).bytes(),
         } as unknown as Blob);
       }
     }

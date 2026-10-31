@@ -23,10 +23,21 @@ Then:
 ```bash
 npm run seed   # adds the 4 services and the admin account (safe to run again)
 npm run dev    # starts on http://localhost:5000 and restarts when you save
-npm test       # runs the API tests against a temporary in-memory database
+npm test       # runs the API tests (see below for which database they use)
 ```
 
 Check it's running: open http://localhost:5000/api/health.
+
+### Running the tests
+
+The tests need their own database, which they empty before and after running. Your real `cleardocs` database is never touched.
+
+- **Using the MongoDB on your computer (fastest):**
+  ```powershell
+  $env:TEST_MONGO_URI="mongodb://127.0.0.1:27017/cleardocs_test"
+  npm test
+  ```
+- **Without a local MongoDB:** just run `npm test`. It downloads a temporary MongoDB the first time (a few hundred MB).
 
 ## Endpoints
 

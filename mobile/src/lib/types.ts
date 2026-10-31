@@ -40,3 +40,14 @@ export type DocRequest = {
   createdAt: string;
   updatedAt: string;
 };
+
+// A message sent from the website's Contact form
+export type Enquiry = {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  service?: string; // service slug, e.g. "apostille"
+  message: string;
+  createdAt: string;
+};
