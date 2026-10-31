@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getPost, getPosts, formatDate } from "@/lib/wordpress";
+import { getPost, getPosts, formatDate, readingTime } from "@/lib/wordpress";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -44,9 +44,11 @@ export default async function PostPage({ params }: Props) {
         All guides
       </Link>
       <h1 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">{post.title}</h1>
-      <time dateTime={post.date} className="mt-4 block text-muted">
-        {formatDate(post.date)}
-      </time>
+      <p className="mt-4 text-muted">
+        <time dateTime={post.date}>{formatDate(post.date)}</time>
+        <span aria-hidden="true"> · </span>
+        {readingTime(post.content)}
+      </p>
 
       {post.image && (
         <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-2xl">
