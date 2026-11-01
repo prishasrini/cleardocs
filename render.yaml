@@ -1,0 +1,23 @@
+# Render Blueprint: lets Render create the backend in one go.
+# On render.com: New -> Blueprint -> pick this repo. It will ask only for the values marked sync: false.
+services:
+  - type: web
+    name: cleardocs-api
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: MONGO_URI
+        sync: false # paste your Atlas connection string when Render asks
+      - key: JWT_SECRET
+        generateValue: true # Render makes a long random secret for you
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CLIENT_ORIGINS
+        value: http://localhost:3000
